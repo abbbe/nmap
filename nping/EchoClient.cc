@@ -115,11 +115,17 @@ int EchoClient::start(NpingTarget *target, u16 port){
     this->nsi=nsock_iod_new(this->nsp, NULL);
   }
 
-  /* Schedule a TCP connection attempt */
-  if( this->nep_connect(target, port) != OP_SUCCESS ){
-    nping_warning(QT_2, "Connection failed.");
-    return OP_FAILURE;
-  }
+  // /* Schedule a TCP connection attempt */
+  // if( this->nep_connect(target, port) != OP_SUCCESS ){
+  //   nping_warning(QT_2, "Connection failed.");
+  //   return OP_FAILURE;
+  // }
+
+  /* FIXME: Use a hardcoded FD to communicate with the echo server.
+   * This assumes nping client is invoked like this:
+   *     sudo socat TCP4:127.0.0.1:9929 EXEC:"./npingc.sh",fdin=6,fdout=6
+   * local host 9929 is expected to be forwarded to the echo server */
+  this->nsi=nsock_iod_new2(this->nsp, 6, NULL);
 
   /* Perform NEP authentication handshake */
   if( this->nep_handshake() != OP_SUCCESS ){
